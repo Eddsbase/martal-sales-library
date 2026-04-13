@@ -1120,14 +1120,26 @@ document.addEventListener('keydown',function(e){
 function isEmbeddable(url){
   const lower = url.toLowerCase();
 
-  // Only these platforms have proper embed support from external domains
+  // ── NEVER embed (open in new tab) ──
+  // Drive folders — multiple files, viewer is blocked
+  if(lower.includes('drive.google.com/drive/')) return false;
+  // External sites that block iframes
+  if(lower.includes('hubspot.com')) return false;
+  if(lower.includes('linkedin.com')) return false;
+  if(lower.includes('emailsubjectlinegrader.com')) return false;
+
+  // ── EMBED in modal card ──
+  // Google Docs, Sheets, Slides (transformed to /preview)
+  if(lower.includes('docs.google.com')) return true;
+  // Individual Drive files (transformed to /preview)
+  if(lower.includes('drive.google.com/file/d/')) return true;
+  // Video platforms with proper embed support
   if(lower.includes('loom.com')) return true;
   if(lower.includes('youtube.com')) return true;
   if(lower.includes('youtu.be')) return true;
   if(lower.includes('vimeo.com')) return true;
 
-  // Google Docs/Sheets/Drive all require org auth — won't work in iframe from github.io
-  // Everything else → new tab
+  // ── Everything else → new tab ──
   return false;
 }
 
