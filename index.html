@@ -95,9 +95,9 @@ a:hover{color:var(--g2)}
 .flinks{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
 
 /* TABLE */
-.tw{overflow-x:auto;border:1px solid var(--b1);border-radius:var(--r2);background:var(--s1)}
-.vt{width:100%;border-collapse:collapse;font-size:.8rem}
-.vt th{text-align:left;font-family:var(--m);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);padding:.85rem 1rem;border-bottom:1px solid var(--b1);background:var(--s2);position:sticky;top:64px;z-index:2}
+.tw{overflow:auto;max-height:70vh;border:1px solid var(--b1);border-radius:var(--r2);background:var(--s1)}
+.vt{width:100%;border-collapse:collapse;font-size:.8rem;min-width:900px}
+.vt th{text-align:left;font-family:var(--m);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);padding:.85rem 1rem;border-bottom:1px solid var(--b1);background:var(--s2);position:sticky;top:0;z-index:2}
 .vt td{padding:.85rem 1rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:top;color:var(--t2);line-height:1.55;font-weight:300}
 .vt tbody tr{transition:.15s}
 .vt tbody tr:hover td{background:rgba(255,255,255,.02)}
