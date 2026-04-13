@@ -229,6 +229,8 @@ a:hover{color:var(--g2)}
 .admin-list li .remove-btn{opacity:0;font-size:.65rem;color:#ef4444;cursor:pointer;padding:.25rem .5rem;border-radius:5px;border:1px solid transparent;background:none;font-family:var(--f);transition:.2s}
 .admin-list li:hover .remove-btn{opacity:1}
 .admin-list li .remove-btn:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2)}
+.admin-list li .meta{display:flex;gap:.6rem;font-size:.62rem;color:var(--t4);margin-top:.15rem;font-family:var(--m)}
+.admin-list li .meta span{white-space:nowrap}
 .admin-msg{font-size:.78rem;padding:.5rem .8rem;border-radius:8px;margin-bottom:1rem;display:none}
 .admin-msg.success{display:block;background:rgba(128,177,34,.1);color:var(--g);border:1px solid var(--g-bd)}
 .admin-msg.error{display:block;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
@@ -524,15 +526,17 @@ Sign in with Google
 <div class="admin-panel">
 <div class="admin-hd">
 <h3>&#9881; Access Management</h3>
+<span id="adminStats" style="font-size:.7rem;color:var(--t3);font-family:var(--m)"></span>
 <button class="modal-close" onclick="closeAdminPanel()">&times;</button>
 </div>
 <div class="admin-body">
 <div class="admin-msg" id="adminMsg"></div>
 
 <div class="admin-section">
-<h4>Add User or Domain</h4>
+<h4>Add Users or Domains</h4>
+<p style="font-size:.72rem;color:var(--t4);margin-bottom:.6rem;line-height:1.5">Enter an email or @domain. Separate multiple entries with commas.</p>
 <div class="admin-add">
-<input type="text" id="adminEmailInput" placeholder="user@company.com or @company.com">
+<input type="text" id="adminEmailInput" placeholder="user@company.com, @newdomain.com">
 <button onclick="adminAddEmail()">Add</button>
 </div>
 </div>
@@ -546,9 +550,16 @@ Sign in with Google
 
 <div class="admin-section">
 <h4>Authorized Users</h4>
+<div style="margin-bottom:.6rem">
+<input type="text" id="adminSearch" placeholder="Search users..." style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:.45rem .8rem;color:var(--t);font-family:var(--f);font-size:.78rem;outline:none" oninput="filterAdminList()">
+</div>
 <ul class="admin-list" id="adminEmailList">
 <li class="admin-loading">Loading...</li>
 </ul>
+</div>
+
+<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--b1);text-align:center">
+<a id="adminSheetLink" href="#" target="_blank" style="font-size:.72rem;color:var(--t3);text-decoration:none;font-family:var(--m)">Open Google Sheet for bulk editing &#8599;</a>
 </div>
 </div>
 </div>
@@ -649,6 +660,7 @@ function fetchAllowedEmails(){
     .then(data => {
       if(data.emails) dynamicEmails = data.emails.map(e => e.toLowerCase());
       if(data.domains) dynamicDomains = data.domains.map(d => d.toLowerCase());
+      if(data.entries) allEntries = data.entries;
       emailsLoaded = true;
     })
     .catch(err => console.warn('Failed to fetch email list:', err));
@@ -706,6 +718,8 @@ function denyAccess(){
 }
 
 // ── ADMIN PANEL ──
+let allEntries = [];
+
 function showAdminMsg(msg, type){
   const el = document.getElementById('adminMsg');
   el.textContent = msg;
@@ -713,33 +727,75 @@ function showAdminMsg(msg, type){
   setTimeout(()=> el.className = 'admin-msg', 4000);
 }
 
+function formatDate(str){
+  if(!str) return '';
+  try {
+    const d = new Date(str);
+    if(isNaN(d)) return '';
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  } catch(e){ return ''; }
+}
+
 function renderAdminLists(){
   const emailList = document.getElementById('adminEmailList');
   const domainList = document.getElementById('adminDomainList');
+  const stats = document.getElementById('adminStats');
 
-  // Combine static + dynamic
-  const allEmails = [...new Set([...AUTH_CONFIG.allowedEmails, ...dynamicEmails])].sort();
-  const allDomains = [...new Set([...AUTH_CONFIG.allowedDomains, ...dynamicDomains])].sort();
+  // Combine static + dynamic entries
+  const staticDomains = AUTH_CONFIG.allowedDomains.map(d => ({value:d.toLowerCase(),type:'domain',added:'',addedBy:'(static)'}));
+  const staticEmails = AUTH_CONFIG.allowedEmails.map(e => ({value:e.toLowerCase(),type:'email',added:'',addedBy:'(static)'}));
+  const apiEntries = allEntries.filter(e => e.value);
 
-  domainList.innerHTML = allDomains.length
-    ? allDomains.map(d => '<li><span class="email domain">'+d+'</span>'
-      + (AUTH_CONFIG.apiUrl ? '<button class="remove-btn" onclick="adminRemoveEmail(\''+d+'\')">Remove</button>' : '')
-      + '</li>').join('')
-    : '<li style="color:var(--t4)">No domains configured</li>';
+  // Merge, dedup by value
+  const seen = new Set();
+  const merged = [];
+  // API entries take priority (have metadata)
+  [...apiEntries, ...staticDomains, ...staticEmails].forEach(e => {
+    if(!seen.has(e.value)){ seen.add(e.value); merged.push(e); }
+  });
 
-  emailList.innerHTML = allEmails.length
-    ? allEmails.map(e => '<li><span class="email">'+e+'</span>'
-      + (AUTH_CONFIG.apiUrl ? '<button class="remove-btn" onclick="adminRemoveEmail(\''+e+'\')">Remove</button>' : '')
-      + '</li>').join('')
-    : '<li style="color:var(--t4)">No individual emails configured</li>';
+  const domains = merged.filter(e => e.type === 'domain').sort((a,b) => a.value.localeCompare(b.value));
+  const emails = merged.filter(e => e.type === 'email').sort((a,b) => a.value.localeCompare(b.value));
+
+  stats.textContent = domains.length + ' domain' + (domains.length!==1?'s':'') + ', ' + emails.length + ' user' + (emails.length!==1?'s':'');
+
+  domainList.innerHTML = domains.length
+    ? domains.map(d => renderEntry(d)).join('')
+    : '<li style="color:var(--t4);font-size:.78rem">No domains configured</li>';
+
+  emailList.innerHTML = emails.length
+    ? emails.map(e => renderEntry(e)).join('')
+    : '<li style="color:var(--t4);font-size:.78rem">No individual emails</li>';
+}
+
+function renderEntry(e){
+  const dateStr = formatDate(e.added);
+  const byStr = e.addedBy || '';
+  const meta = (dateStr || byStr) ? '<div class="meta">'
+    + (dateStr ? '<span>'+dateStr+'</span>' : '')
+    + (byStr ? '<span>by '+byStr+'</span>' : '')
+    + '</div>' : '';
+  const cls = e.type === 'domain' ? ' domain' : '';
+  const canRemove = AUTH_CONFIG.apiUrl && e.addedBy !== '(static)';
+  return '<li data-email="'+e.value+'">'
+    + '<div style="flex:1"><span class="email'+cls+'">'+e.value+'</span>'+meta+'</div>'
+    + (canRemove ? '<button class="remove-btn" onclick="adminRemoveEmail(\''+e.value+'\')">Remove</button>' : '')
+    + '</li>';
+}
+
+function filterAdminList(){
+  const q = (document.getElementById('adminSearch').value || '').toLowerCase();
+  document.querySelectorAll('#adminEmailList li[data-email]').forEach(li => {
+    li.style.display = li.dataset.email.includes(q) ? '' : 'none';
+  });
 }
 
 window.openAdminPanel = function(){
   document.getElementById('adminOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
-  // Refresh the list
+  document.getElementById('adminSearch').value = '';
   if(AUTH_CONFIG.apiUrl){
-    fetchAllowedEmails().then(renderAdminLists);
+    fetchAllowedEmailsFull().then(renderAdminLists);
   } else {
     renderAdminLists();
   }
@@ -754,35 +810,63 @@ document.getElementById('adminOverlay').addEventListener('click', function(e){
   if(e.target === this) closeAdminPanel();
 });
 
+// Fetch with full metadata
+function fetchAllowedEmailsFull(){
+  if(!AUTH_CONFIG.apiUrl) return Promise.resolve();
+  return fetch(AUTH_CONFIG.apiUrl + '?action=list')
+    .then(r => r.json())
+    .then(data => {
+      if(data.emails) dynamicEmails = data.emails.map(e => e.toLowerCase());
+      if(data.domains) dynamicDomains = data.domains.map(d => d.toLowerCase());
+      if(data.entries) allEntries = data.entries;
+      emailsLoaded = true;
+    })
+    .catch(err => console.warn('Failed to fetch:', err));
+}
+
 window.adminAddEmail = function(){
   const input = document.getElementById('adminEmailInput');
-  const val = input.value.trim().toLowerCase();
-  if(!val){ showAdminMsg('Enter an email or domain','error'); return; }
-  if(!val.includes('@')){ showAdminMsg('Must contain @ (e.g., user@co.com or @co.com)','error'); return; }
+  const raw = input.value.trim().toLowerCase();
+  if(!raw){ showAdminMsg('Enter an email or domain','error'); return; }
+
+  // Split by comma for bulk add
+  const items = raw.split(',').map(s => s.trim()).filter(s => s && s.includes('@'));
+  if(!items.length){ showAdminMsg('Must contain @ (e.g., user@co.com or @co.com)','error'); return; }
 
   if(AUTH_CONFIG.apiUrl){
     const session = getSession();
     const by = session ? session.email : 'admin';
-    const url = AUTH_CONFIG.apiUrl + '?action=add&email=' + encodeURIComponent(val) + '&by=' + encodeURIComponent(by);
-    fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      if(data.success !== false){
-        showAdminMsg(data.message || 'Added successfully','success');
-        input.value = '';
-        fetchAllowedEmails().then(renderAdminLists);
-      } else {
-        showAdminMsg(data.message || 'Failed to add','error');
-      }
-    })
-    .catch(err => showAdminMsg('API error: ' + err.message,'error'));
-  } else {
-    if(val.startsWith('@')){
-      AUTH_CONFIG.allowedDomains.push(val);
+
+    if(items.length === 1){
+      const url = AUTH_CONFIG.apiUrl + '?action=add&email=' + encodeURIComponent(items[0]) + '&by=' + encodeURIComponent(by);
+      fetch(url).then(r => r.json()).then(data => {
+        if(data.success !== false){
+          showAdminMsg(data.message || 'Added','success');
+          input.value = '';
+          fetchAllowedEmailsFull().then(renderAdminLists);
+        } else {
+          showAdminMsg(data.message || 'Failed','error');
+        }
+      }).catch(err => showAdminMsg('API error: ' + err.message,'error'));
     } else {
-      AUTH_CONFIG.allowedEmails.push(val);
+      // Bulk add
+      const url = AUTH_CONFIG.apiUrl + '?action=bulk&emails=' + encodeURIComponent(items.join(',')) + '&by=' + encodeURIComponent(by);
+      fetch(url).then(r => r.json()).then(data => {
+        if(data.success !== false){
+          showAdminMsg(data.message || 'Added ' + items.length,'success');
+          input.value = '';
+          fetchAllowedEmailsFull().then(renderAdminLists);
+        } else {
+          showAdminMsg(data.message || 'Failed','error');
+        }
+      }).catch(err => showAdminMsg('API error: ' + err.message,'error'));
     }
-    showAdminMsg('Added to current session (set apiUrl for persistence)','success');
+  } else {
+    items.forEach(val => {
+      if(val.startsWith('@')) AUTH_CONFIG.allowedDomains.push(val);
+      else AUTH_CONFIG.allowedEmails.push(val);
+    });
+    showAdminMsg('Added ' + items.length + ' to session (set apiUrl for persistence)','success');
     input.value = '';
     renderAdminLists();
   }
@@ -790,24 +874,19 @@ window.adminAddEmail = function(){
 
 window.adminRemoveEmail = function(email){
   if(!confirm('Remove ' + email + '?')) return;
-
   if(AUTH_CONFIG.apiUrl){
     const url = AUTH_CONFIG.apiUrl + '?action=remove&email=' + encodeURIComponent(email);
-    fetch(url)
-    .then(r => r.json())
-    .then(data => {
+    fetch(url).then(r => r.json()).then(data => {
       if(data.success !== false){
         showAdminMsg(data.message || 'Removed','success');
-        fetchAllowedEmails().then(renderAdminLists);
+        fetchAllowedEmailsFull().then(renderAdminLists);
       } else {
         showAdminMsg(data.message || 'Failed','error');
       }
-    })
-    .catch(err => showAdminMsg('API error: ' + err.message,'error'));
+    }).catch(err => showAdminMsg('API error: ' + err.message,'error'));
   }
 };
 
-// Handle Enter key in admin input
 document.getElementById('adminEmailInput').addEventListener('keydown', function(e){
   if(e.key === 'Enter') adminAddEmail();
 });
@@ -1004,11 +1083,10 @@ function openModal(url,titleText){
   // Track resource open
   trackEvent('resource_open', { resource_title: titleText, resource_url: url });
 
+  // Just hide spinner after 3s — iframe stays visible regardless
   const timer=setTimeout(()=>{
     loading.style.display='none';
-    frame.style.display='none';
-    fallback.classList.add('show');
-  },8000);
+  },3000);
 
   frame.onload=function(){
     clearTimeout(timer);
@@ -1017,8 +1095,6 @@ function openModal(url,titleText){
   frame.onerror=function(){
     clearTimeout(timer);
     loading.style.display='none';
-    frame.style.display='none';
-    fallback.classList.add('show');
   };
 
   overlay.classList.add('active');
