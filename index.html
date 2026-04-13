@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martal Sales Enablement Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --surface-2: #1c1c1c;
+  --surface-3: #232323;
+  --border: #2a2a2a;
+  --border-hover: #3a3a3a;
+  --green: #80b122;
+  --green-dim: rgba(128,177,34,0.12);
+  --green-glow: rgba(128,177,34,0.25);
+  --blue: #2d9cdb;
+  --blue-dim: rgba(45,156,219,0.10);
+  --text: #e8e8e8;
+  --text-2: #a0a0a0;
+  --text-3: #6a6a6a;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'Space Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--green); text-decoration: none; transition: color 0.2s; }
+a:hover { color: #9fd33a; }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(14,14,14,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 60px;
+}
+.nav-logo {
+  font-weight: 700; font-size: 1rem; letter-spacing: -0.02em;
+  color: var(--text);
+}
+.nav-logo span { color: var(--green); }
+.nav-links { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.nav-links a {
+  font-size: 0.72rem; font-weight: 500; color: var(--text-2);
+  padding: 0.35rem 0.65rem; border-radius: 6px; transition: all 0.2s;
+  white-space: nowrap; letter-spacing: 0.01em;
+}
+.nav-links a:hover { color: var(--text); background: var(--surface-2); }
+.nav-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; font-size: 1.4rem; }
+
+/* ── HERO ── */
+.hero {
+  padding: 10rem 2rem 5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, var(--green-dim) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  position: relative;
+}
+.hero h1 em { font-style: normal; color: var(--green); }
+.hero p {
+  max-width: 640px; margin: 1.5rem auto 0;
+  font-size: 1.05rem; color: var(--text-2); line-height: 1.7;
+}
+
+/* ── SECTIONS ── */
+.section {
+  max-width: 1280px; margin: 0 auto;
+  padding: 4rem 2rem;
+}
+.section-header {
+  display: flex; align-items: baseline; gap: 1rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+.section-header h2 {
+  font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+}
+.section-header .tag {
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--green); background: var(--green-dim);
+  padding: 0.25rem 0.6rem; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.section-intro {
+  color: var(--text-2); font-size: 0.95rem;
+  max-width: 800px; margin-bottom: 2rem; line-height: 1.7;
+}
+
+/* ── CARD GRID ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.4rem;
+  transition: all 0.25s;
+  display: flex; flex-direction: column;
+}
+.card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.card-label {
+  font-family: var(--mono); font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-3); margin-bottom: 0.6rem;
+}
+.card h3 {
+  font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem;
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+.card p {
+  font-size: 0.82rem; color: var(--text-2); line-height: 1.6;
+  flex: 1;
+}
+.card-link {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 1rem;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--green);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--green-dim);
+  border-radius: 6px;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+.card-link:hover {
+  background: var(--green-dim);
+  border-color: var(--green);
+}
+.card-link.blue { color: var(--blue); border-color: var(--blue-dim); }
+.card-link.blue:hover { background: var(--blue-dim); border-color: var(--blue); }
+
+/* ── TABLE LAYOUTS ── */
+.vault-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.vault-table th {
+  text-align: left; font-family: var(--mono);
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-3);
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 60px;
+  background: var(--bg);
+}
+.vault-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.vault-table tr:hover td { background: var(--surface); }
+.vault-table .pill {
+  display: inline-block;
+  font-family: var(--mono); font-size: 0.6rem;
+  padding: 0.2rem 0.5rem; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.pill-product { background: rgba(45,156,219,0.12); color: var(--blue); }
+.pill-service { background: var(--green-dim); color: var(--green); }
+.pill-booked { background: rgba(128,177,34,0.15); color: var(--green); }
+.pill-sql { background: rgba(45,156,219,0.15); color: var(--blue); }
+.pill-flip { background: rgba(255,180,50,0.15); color: #f0a030; }
+
+/* ── SUBSECTIONS ── */
+.sub-group { margin-bottom: 3rem; }
+.sub-group h3 {
+  font-size: 1.1rem; font-weight: 600;
+  margin-bottom: 0.4rem; letter-spacing: -0.01em;
+}
+.sub-group .sub-desc {
+  font-size: 0.85rem; color: var(--text-2);
+  margin-bottom: 1.2rem; max-width: 720px;
+}
+
+/* ── OBJECTION BLOCKS ── */
+.objection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1rem;
+}
+.objection-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border-left: 3px solid var(--green);
+}
+.objection-card h4 {
+  font-size: 0.9rem; font-weight: 700; margin-bottom: 0.6rem;
+}
+.objection-card .examples {
+  font-size: 0.8rem; color: var(--text-3);
+  font-style: italic; margin-bottom: 0.6rem; line-height: 1.6;
+}
+.objection-card p {
+  font-size: 0.82rem; color: var(--text-2); line-height: 1.6;
+}
+
+/* ── LINKEDIN ── */
+.link-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.link-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  transition: all 0.2s;
+}
+.link-item:hover { border-color: var(--border-hover); transform: translateX(4px); }
+.link-item .icon {
+  width: 36px; height: 36px;
+  background: var(--blue-dim);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.link-item .info h4 { font-size: 0.88rem; font-weight: 600; }
+.link-item .info p { font-size: 0.78rem; color: var(--text-2); }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center; padding: 3rem 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-3); font-size: 0.78rem;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--border); flex-direction: column; padding: 1rem; }
+  .nav-links.open { display: flex; }
+  .nav-toggle { display: block; }
+  .hero { padding: 8rem 1.5rem 3rem; }
+  .section { padding: 2.5rem 1rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .objection-grid { grid-template-columns: 1fr; }
+  .vault-table { display: block; overflow-x: auto; }
+  .section-header { flex-direction: column; gap: 0.5rem; }
+}
+
+/* ── SCROLL TABLE CONTAINER ── */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.table-wrap .vault-table td:first-child,
+.table-wrap .vault-table th:first-child { padding-left: 1.2rem; }
+
+/* ── SEARCH ── */
+.search-bar {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  max-width: 400px;
+  margin-bottom: 2rem;
+}
+.search-bar input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-family: var(--font);
+  font-size: 0.88rem; width: 100%;
+}
+.search-bar input::placeholder { color: var(--text-3); }
+.search-icon { color: var(--text-3); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">MARTAL <span>SALES LIBRARY</span></div>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="#training">Training</a>
+      <a href="#playbooks">Playbooks</a>
+      <a href="#recordings">Call Vault</a>
+      <a href="#scripts">Scripts</a>
+      <a href="#objections">Objections</a>
+      <a href="#linkedin">LinkedIn</a>
+      <a href="#prospecting">Prospecting</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>The Martal <em>Sales Enablement</em> Library</h1>
+  <p>Real-world resources to help you work smarter — best-in-class call recordings, proven cold call frameworks, objection handling strategies, industry playbooks, smart prospecting guides, and AI-powered daily practice tools.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- TRAINING VIDEOS & DOCS -->
+<!-- ============================================================ -->
+<section class="section" id="training">
+  <div class="section-header">
+    <h2>Training Videos &amp; Docs</h2>
+    <span class="tag">Onboarding &amp; Skills</span>
+  </div>
+
+  <!-- Martal Training -->
+  <div class="sub-group">
+    <h3>Martal Training</h3>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Preparing for Your Client Kick-Off Call</h3>
+        <p>How to prepare for a kickoff call by reviewing the client's business profile, audience, and available materials in the client portal or shared drive.</p>
+        <a class="card-link" href="https://www.loom.com/share/14ea698498404af3a162c1941f519910" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Defining ICP</h3>
+        <p>What an Ideal Customer Profile really is and why it's critical to successful outreach. How to use client-provided ICP details to understand who you're targeting.</p>
+        <a class="card-link" href="https://www.youtube.com/watch?v=3h1NQTwulqs" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Web Tool</div>
+        <h3>Website/Subject Line Grader</h3>
+        <p>Site that grades your subject lines for email campaigns.</p>
+        <a class="card-link" href="http://emailsubjectlinegrader.com/" target="_blank">&#8599; Open Tool</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Article</div>
+        <h3>Spam Trigger Words</h3>
+        <p>Spam trigger words: How to keep your emails out of the spam folder.</p>
+        <a class="card-link" href="https://blog.hubspot.com/blog/tabid/6307/bid/30684/the-ultimate-list-of-email-spam-trigger-words.aspx" target="_blank">&#8599; Read Article</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Email Writing Formulas for SDRs (Part 1)</h3>
+        <p>Effective email outreach formulas for engaging prospects and moving them through the sales funnel.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/12DZ0AzFfvI4_No1juoVe9PItVNFwxMm8vWBYV9iVEHU/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Email Writing Formulas for SDRs (Part 2)</h3>
+        <p>Continuation of email outreach formulas and engagement strategies.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/15ss4_wvDWDHGxg6xmNRaD-Mje8fBZzxzoS8SkAMEXUc/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Landbase Data Search: Step by Step</h3>
+        <p>Steps to build a targeted list in Landbase using an approved ICP.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1a4cr2n6UFvMOEdzmppTXWn1vtfkHdfJL8b3X5ukuxX4/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Building Lead Lists: Importing Data &amp; Website Enrichment</h3>
+        <p>Two ways to build lead lists: importing an existing contact list or creating a list from company data enrichment.</p>
+        <a class="card-link" href="https://www.loom.com/share/614c652b72dc41de8c724c5d4357853a" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Client Start Expectations &amp; Checklist</h3>
+        <p>Structured onboarding and timeline process for new clients, ensuring SDRs are aligned from day one.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1l9MxV5dw7WjR_XFMbtUBXNdQdWf-vsQfeVtxl4cXARM/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Rep Replacement Expectations &amp; Timeline</h3>
+        <p>When a new SDR replaces another rep on an account, this ensures the transition is seamless and efficient.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/14uLtZ1BH9wFb37hAK_Z9A3aqSeu5lbAG5Siz_vEYfXY/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Scheduling Calls for Clients</h3>
+        <p>Steps to book meetings for your clients via their direct calendars.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/14uLtZ1BH9wFb37hAK_Z9A3aqSeu5lbAG5Siz_vEYfXY/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Using Lunch &amp; Learns as a Resource</h3>
+        <p>How to use Lunch and Learns as a high-impact outreach tactic, including how meals are delivered to prospects.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/14uLtZ1BH9wFb37hAK_Z9A3aqSeu5lbAG5Siz_vEYfXY/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Objection Handling Common Responses</h3>
+        <p>Guidance on handling common prospect objections by focusing on active listening and asking clarifying questions.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1zVvKXHApenRHEMC7yTV_QpstsNj_OHlD0-jJy9NRtnY/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Martal Communication Policies</h3>
+        <p>Communication standards ensuring all outreach complies with CAN-SPAM, CASL, and GDPR requirements.</p>
+        <a class="card-link" href="https://drive.google.com/drive/folders/1ucBABSSEazSueohiJAqJ1RoJgT18FLTR" target="_blank">&#128196; Open Folder</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>MQL/SQL Definitions</h3>
+        <p>Defines the difference between MQLs, SQLs, and Flips using Martal-specific language and examples.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1i1WEa_csRUte7oOwxRSd7b7o1Gc2JIwBiV9QdYgTj3g/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Dial-First Operating Model</h3>
+        <p>All accounts are implementing a new Dial First operating model. This doc walks through expectations.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1IMAZVrI3SzsDXnGi_OFGNbAHcMEMs53d_RtT2qRgiZs/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Landbase -->
+  <div class="sub-group">
+    <h3>Landbase Training</h3>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Full Process: Campaign Launch</h3>
+        <p>A holistic view of how to create email templates, generate your ICP, and launch your campaign.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/84770c098ab94ffd871e32544a4338b1" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Adding Numbers for Call Campaigns</h3>
+        <p>How to add and manage phone numbers for outbound call campaigns, including area code selection and routing.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/931f0ae3af914dbe9d48c75582b346ed" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>How to Pull Lead &amp; Activity Reports</h3>
+        <p>How to efficiently pull MQL/SQL data, track outreach activity (calls, emails, LinkedIn), and manage lead sheets.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/f7367c34f16f4241913f1c68d37018c3" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Adding a Signature</h3>
+        <p>How to add or edit your email signature for client domains under settings.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/bdf7a915cd0e4e2ba5a62358ac137b6a" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Add a Phone Number &amp; Start a Dial Session</h3>
+        <p>Tutorial on adding, rotating, and forwarding phone numbers to support higher connect rates.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/9c9b4c668e8340d5ae44768cebfa99e1" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Create a Dial Session</h3>
+        <p>How to set up efficient dialing sessions — from naming conventions to lead list prep.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/d42a2f99fe804620b51fdf20ac8070e9" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Enriching Company Lists</h3>
+        <p>How to quickly enrich a company list by pasting in URLs and saving it under your client's company list.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/86f34bf6a25f4c72b6f87e5f555d1238" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Email Campaign Maintenance</h3>
+        <p>Check campaign performance, add new leads using saved filters, and track updates to keep outreach on track.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/d67c467a0e1c4b40815e7a3870ed7046" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Building Lead Lists in LandBase</h3>
+        <p>Two ways to build prospect lists — importing client-provided contacts and creating lists from website-based searches.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/614c652b72dc41de8c724c5d4357853a" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>LandBase ICP Search Filters</h3>
+        <p>Key ICP search filters and how reps can use them to build cleaner, more targeted lead lists.</p>
+        <a class="card-link blue" href="https://docs.google.com/document/d/1SB70EekJBiHMrJF1wcBe8qTTLQfOh03qIIruHgRNVQQ/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Broadening Your ICP in Landbase</h3>
+        <p>Sometimes the initial ICP is too narrow to deliver volume. Here's how to responsibly expand it.</p>
+        <a class="card-link blue" href="https://docs.google.com/document/d/1LKuEMNijXbBZfu2xrQCuzFwI2W_rmt4pQ32ZlMrr_Us/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Spreadsheet</div>
+        <h3>Expanding Industries within Landbase &amp; LinkedIn</h3>
+        <p>Industry selection simplified — pairs searchable industries with detailed targeting guidance.</p>
+        <a class="card-link blue" href="https://docs.google.com/spreadsheets/d/1kwuEL7Yy0fnAvWOfRA8xDD7siiO8adWXvlBHuYQlcJM/edit?usp=sharing" target="_blank">&#128196; Open Sheet</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Create a Follow-Up/Re-engagement Email Campaign</h3>
+        <p>Steps to effectively re-engage old prospects with a follow-up email campaign.</p>
+        <a class="card-link blue" href="https://docs.google.com/document/d/1xOkwdvd-QCWLqw4dDytB185Qbcl7ItmZiXrwT71s96E/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>LinkedIn Setup: Account Connection &amp; Campaign Creation</h3>
+        <p>Connecting your LinkedIn account and creating campaigns in Landbase.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/0203b81f07314c11a6ebb8b5f6e34411" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Step-by-Step: LinkedIn Setup &amp; Campaign Creation</h3>
+        <p>Written guide for connecting your LinkedIn account and launching campaigns.</p>
+        <a class="card-link blue" href="https://docs.google.com/document/d/1MukxmJzaF7oXb2jfyegZMAASS1HGF-QA/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Managing LinkedIn Replies &amp; Reporting</h3>
+        <p>How to access and manage your LinkedIn campaign responses and find reporting data.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/3027b1a2e338453ea4e75a6f3c012e0c" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Step-by-Step: Managing LinkedIn Replies &amp; Reporting</h3>
+        <p>Written guide for managing LinkedIn campaign responses and reporting.</p>
+        <a class="card-link blue" href="https://docs.google.com/document/d/17ur-CXSkJ8S1DzihiXnv48IY406Ofrpo/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Engagement Status Logic</h3>
+        <p>How the filtering system works for contacts in the logic setup.</p>
+        <a class="card-link blue" href="https://www.loom.com/share/4da64d03fdbe4c7d95004d39e51bab48" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Document</div>
+        <h3>Engagement Filter Cheat Sheet</h3>
+        <p>Definitions of engagement filters and the logic on how to use them.</p>
+        <a class="card-link blue" href="http://engagement_filters_cheat_sheet/" target="_blank">&#128196; Open Doc</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Trainual -->
+  <div class="sub-group">
+    <h3>Trainual: Expand Your Skillset</h3>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-label">Course</div>
+        <h3>Objection Handling: Deep Dive Course</h3>
+        <p>Learn to recognize objections as signals of interest, fear, or uncertainty that can be redirected into meaningful dialogue. Reach out to Sales Enablement for access.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Course</div>
+        <h3>Social Listening for Agencies: Scale the Unscalable</h3>
+        <p>A comprehensive, scalable framework for social listening as an agency SDR at Martal Group. Reach out to Sales Enablement for access.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- General Workflow -->
+  <div class="sub-group">
+    <h3>General Workflow</h3>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Time Management Strategies (Inbox/Lead Lists)</h3>
+        <p>Angela shares her Sunday setup and daily inbox habits that help manage multiple clients, record MQLs/SQLs consistently, and keep organized.</p>
+        <a class="card-link" href="https://www.loom.com/share/7c6f65fdbc1c4fcfb37ca116d3bb652c" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Excel: Split Full Names into First/Last</h3>
+        <p>Quick tutorial on how to split full names in Excel using 'Text to Columns' and save correctly as a CSV.</p>
+        <a class="card-link" href="https://www.loom.com/share/796b9f0d91964c17a5e52ba3ff184c41" target="_blank">&#9654; Watch</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Video</div>
+        <h3>Vacation Request / Time Off: Martal Calendar</h3>
+        <p>How to correctly add your time off to the Martal Vacation Calendar so it's visible to the full team.</p>
+        <a class="card-link" href="https://www.loom.com/share/71c2844305c3400383ac72a37209db89" target="_blank">&#9654; Watch</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PLAYBOOKS -->
+<!-- ============================================================ -->
+<section class="section" id="playbooks">
+  <div class="section-header">
+    <h2>Playbooks</h2>
+    <span class="tag">Outbound &amp; Industry</span>
+  </div>
+
+  <!-- Outbound Series -->
+  <div class="sub-group">
+    <h3>Outbound: The Martal Process</h3>
+    <p class="sub-desc">Everything a rep needs to run effective outbound — from cold calling fundamentals and email/LinkedIn strategy to ABM, objection handling, list building, and day-to-day operations. Each volume is a standalone reference.</p>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-label">Vol. 1</div>
+        <h3>Cold Calling Playbook</h3>
+        <p>The foundation. Covers the mindset, structure, scripts, and habits behind consistent cold calling.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1nlZ-g60mEjjbbGFWfVUR2eOAcfuBUihp/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Vol. 2</div>
+        <h3>The Service-Led Cold Calling Playbook</h3>
+        <p>Focused on service-led cold calling. Return when the offering is hard to explain or you can't find the right hook.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/13pXZCV38fisYzgvz0A05tPHUdx-dPp1B/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Vol. 3</div>
+        <h3>The Product-Led Cold Calling Playbook</h3>
+        <p>Product-led cold calling at scale. Your intelligence comes from how you built the list.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1Hc6-e2OKkDGd1ce7Au-j4yUSHLvgpotT/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Vol. 4</div>
+        <h3>Email &amp; LinkedIn Playbook</h3>
+        <p>The two async channels that run alongside cold calling. Covers email and LinkedIn strategy.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1yKkGEsJujufsGpziTSfqN-5p7tfd5lvs/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Vol. 5</div>
+        <h3>Account-Based Marketing Playbook</h3>
+        <p>ABM is about going deeper on fewer accounts. Uses every skill from Volumes 1 &amp; 2 but applied with surgical precision.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1VGeVIUMToCA6gSbyoTUtj0F6ni1eLnrR/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Vol. 5A</div>
+        <h3>Objection Handling Playbook</h3>
+        <p>Objections show up on every channel, at every stage — this playbook covers all of them.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1HjJsl5aOsdu66kRM4qyuirKXkPfZ3OKz/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Ext. A</div>
+        <h3>The List-Building Playbook (Landbase Edition)</h3>
+        <p>List building in Landbase specifically. Built around two questions that matter before building any list.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1qEN--pYDq8GugROPskFnJVkyI9SQ8QJt/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Ext. B</div>
+        <h3>The List-Building Playbook (Sales Nav Edition)</h3>
+        <p>Focused on list building in LinkedIn Sales Navigator, one of the most powerful prospecting tools.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/11uKK_ZTHwrStHSfUh70BWK-8TKtSV0zT/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Vol. 6</div>
+        <h3>The Multi-Client Playbook</h3>
+        <p>How you manage the job when you're juggling multiple clients, timezones, and priorities.</p>
+        <a class="card-link" href="https://drive.google.com/file/d/1E0VpjM3YHgAfU80A7g6ithrvdPpu5rEW/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ICP Guides -->
+  <div class="sub-group">
+    <h3>Prospect ICP Guides</h3>
+    <p class="sub-desc">Field briefings for outbound reps calling into specific industries. Covers landscape, org structure, institution types, regulations, key titles, tone guidance, and gatekeeper navigation.</p>
+    <div class="card-grid">
+      <div class="card"><h3>Financial Services</h3><a class="card-link" href="https://drive.google.com/file/d/11AF5_w4oatTkFBwu6i2iTIkscQ_fND9l/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Healthcare</h3><a class="card-link" href="https://drive.google.com/file/d/1dMrIC94Tm0VV57H3rIaRqos8J6sJ7U1c/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Logistics &amp; Supply Chain</h3><a class="card-link" href="https://drive.google.com/file/d/1sqwAFl-1Iy9SbcJrwXAtBQMPyc2X_tBy/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Manufacturing</h3><a class="card-link" href="https://drive.google.com/file/d/1O0C4OBFlT56OWMsdX0pyKsUTFVGCkUWq/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Professional Services</h3><a class="card-link" href="https://drive.google.com/file/d/1HVBXfMEIrhWlg6qxk4u9jQDvSCJMsrDh/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Retail &amp; E-Commerce</h3><a class="card-link" href="https://drive.google.com/file/d/1zTBPkSLZlAn2WJQHwJdnKzkYiIILJVJE/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Energy &amp; Utilities</h3><a class="card-link" href="https://drive.google.com/file/d/1haxAnMKM6YQxv4Yu5rqn3719wdr6bSWT/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Government &amp; Public Sector</h3><a class="card-link" href="https://drive.google.com/file/d/1mBqSN4pZDbVlt8SZxRq_vxJ9t-CHdbHP/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Education</h3><a class="card-link" href="https://drive.google.com/file/d/1Y701i0zfwPwIop8uDfVDE76AVl2mVJgQ/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Real Estate</h3><a class="card-link" href="https://drive.google.com/file/d/1JxbHohEhsCizoA6cwjvZsC42pJbkakfn/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Construction</h3><a class="card-link" href="https://drive.google.com/file/d/1SEwIfBpNToq66B8FqZHeV-B4Dff5LZwD/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Media &amp; Entertainment</h3><a class="card-link" href="https://drive.google.com/file/d/1ZQ83eyqGSEosIRcHcf5VXKGu943zVvYy/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+      <div class="card"><h3>Telecommunications</h3><a class="card-link" href="https://drive.google.com/file/d/1ynBrKFeTICTy2CvaMfMK286N78ExeYzG/view?usp=drive_link" target="_blank">&#128214; Open Guide</a></div>
+    </div>
+  </div>
+
+  <!-- Service-Led -->
+  <div class="sub-group">
+    <h3>Service-Led Client Playbooks</h3>
+    <p class="sub-desc">Built for reps calling on behalf of clients who sell services. Covers the cold call, landscape, gatekeeper &amp; voicemail, signals, objection handling, client collateral, when to walk away, and pain.</p>
+    <div class="card-grid">
+      <div class="card"><h3>Outsourced HR</h3><a class="card-link" href="https://drive.google.com/file/d/1ng5rWdVwAMtI3LU5aTqFmyVbqqOQt24C/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>Managed IT / MSP</h3><a class="card-link" href="https://drive.google.com/file/d/1juVs0hnJsAmMckIcdzhdRrqZIVukYc8X/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>Cybersecurity</h3><a class="card-link" href="https://drive.google.com/file/d/1yh_LTcuiUIMeAzt0e82UKGwJzQvmhABl/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>Digital Transformation</h3><a class="card-link" href="https://drive.google.com/file/d/1-7-sJ_9bt15avP_FshnSEJduIMnaZ1oO/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>Sales Training</h3><a class="card-link" href="https://drive.google.com/file/d/13NYoRq_ZitUNWNKLDvjAsrbqlNma8WXq/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>IT Staffing &amp; Augmentation</h3><a class="card-link" href="https://drive.google.com/file/d/15GhoW-vrcFKG3n2cmqOq6Unmym4MvAng/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>Outsourced Finance &amp; CFO</h3><a class="card-link" href="https://drive.google.com/file/d/1OSaQSdZuPc2tw8o5pSmdAzFkKM5Rmok5/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+      <div class="card"><h3>Marketing &amp; Demand Gen</h3><a class="card-link" href="https://drive.google.com/file/d/1WhQQ5MR2JpWFHkesB2QueIwRu4UrDj-h/view?usp=drive_link" target="_blank">&#128214; Open Playbook</a></div>
+    </div>
+  </div>
+
+  <div class="sub-group">
+    <h3>Product-Led Client Playbooks</h3>
+    <p class="sub-desc" style="color:var(--text-3); font-style:italic;">Coming Soon...</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CALL RECORDING VAULT -->
+<!-- ============================================================ -->
+<section class="section" id="recordings">
+  <div class="section-header">
+    <h2>Call Recording Vault</h2>
+    <span class="tag">Coaching &amp; Practice</span>
+  </div>
+  <p class="section-intro">A coaching tool for both new and experienced reps to hear real examples of booked meetings across different styles. Each call shows what worked, what could be better, and talk track inspiration you can steal.</p>
+  <p style="margin-bottom:1.5rem;"><a class="card-link" href="https://drive.google.com/drive/folders/1JuLKRMTeo-aLpobIB4K6vSZiKb8fopnU?usp=drive_link" target="_blank">&#128193; Open Full Vault Folder</a>
+    <a class="card-link" href="https://www.loom.com/share/a95f076ae7cb491ca578e900c23e8d99" target="_blank" style="margin-left:0.5rem;">&#9654; How To Use (Video)</a>
+    <a class="card-link" href="https://docs.google.com/document/d/1l5yGwxRiDQBj33WqnvN_76fr2WgGaklyg8t0C5b_LP8/edit?usp=sharing" target="_blank" style="margin-left:0.5rem;">&#128196; How To Use (Doc)</a>
+  </p>
+
+  <div class="table-wrap">
+    <table class="vault-table">
+      <thead>
+        <tr>
+          <th style="width:28%">Why This Call</th>
+          <th>Result</th>
+          <th>Industry</th>
+          <th>Type</th>
+          <th>Client / Rep</th>
+          <th style="width:22%">Takeaways</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td>Eric earns trust fast in logistics with clear pacing and smooth transitions — confident delivery.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Logistics</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>OpenDock / Eric T.</td>
+          <td>Kept it clean and moved the call forward efficiently. Can focus on slowing down to validate prospect challenges.</td>
+          <td><a href="https://drive.google.com/file/d/13fNAFXsRO0IqBdjTATVQg0boe_wyIEjR/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/19Kp_Wft_cuXt2X_cLEDu39mAz9OTflS5/view?usp=sharing" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Edgar builds trust in low-tech logistics by leading with curiosity and uncovering real friction.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Logistics</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>OpenDock / Edgar M.</td>
+          <td>Led with curiosity and uncovered real friction points. Next step: reinforce trust by actively summarizing.</td>
+          <td><a href="https://drive.google.com/file/d/1Oo1JvG500U3-velm7ZnwaJxo5xmy3KvI/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1bhZoiQgWTKrWiyfLw2gAhPpdTBLta1b-/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Paul demonstrates how to build rapport fast in service-led sales — strong people-first entry.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Outsourcing: B2B Lead Gen</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>Martal Group / Paul C.</td>
+          <td>Rapport-building is a standout strength. Can sharpen the narrative earlier with anchoring value.</td>
+          <td><a href="https://drive.google.com/file/d/1BY6G5YzJKU-IjEZoMgWCjTxOo0bEHum4/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/15-QYL9JJlIr8Aje3zvyq8DiWdJ60mNE2/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Angela shows how to guide insurtech buyers with permission-led discovery and calm confidence.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Insurtech</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Neutrinos / Angela H.</td>
+          <td>Smooth and consultative — built trust fast by getting permission, guiding with clarity.</td>
+          <td><a href="https://drive.google.com/file/d/1OABcSWjjzVPQmbVMLe7npWASoqqO5-qr/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1qF06YGOlGkCB1s8HjL67ipZIKSEeZLA2/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Angela pivots mid-call and finds relevance in the prospect's actual day-to-day — flexible adaptation.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>IT Services</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>IBA Group / Angela H.</td>
+          <td>Stayed adaptable and built quick relevance by pivoting from original intent to prospect's current role.</td>
+          <td><a href="https://drive.google.com/file/d/1TpyiZBEH5S39o1hlJy_UVVZ0A5UjRASm/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1eJsphYWiQdmF_f802eX-7RSDT-KBhYMg/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Alli wins in logistics by matching a cautious buyer's tone and gently landing the value.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Logistics</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>GXO Logistics / Alli F.</td>
+          <td>Navigated skepticism well and earned the meeting by staying calm and matching tone.</td>
+          <td><a href="https://drive.google.com/file/d/1nupLzYMd7oxGWXlVIUVWUDpFy631TOR0/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1ARYpuqNDeTvhrdhR-5q8LHSNvB8iA-tN/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Anand handles early indifference with strategic ROI framing — strong calm pivot.</td>
+          <td><span class="pill pill-flip">Intro/Flip</span></td>
+          <td>Industrial Equipment Mfg</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>GEA / Anand P.</td>
+          <td>Stayed consultative and used ROI framing to create relevance even when the prospect didn't see immediate need.</td>
+          <td><a href="https://drive.google.com/file/d/1-iu4MQ9T742qXSx27VT8-_I4jPg8eAWq/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/12IYsAjBEAXKNIznt4g5Sls98vhtVRJ9h/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Rebecca breaks through budget objections by offering a no-pressure path — persistence with empathy.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Software Development</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Tray.ai / Rebecca B.</td>
+          <td>Handled resistance with empathy and persistence, reframing as a low-pressure learning opportunity.</td>
+          <td><a href="https://drive.google.com/file/d/1pgp2_odEKBFYzj958QsQWuBm1EHzDJX0/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1PxJWu0lj7volP2ZPULiL4YYwWwLaYap7/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Jesse secures a meeting in a cold recruiting market by staying human and relatable.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Outsourcing: Staffing</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>Search Labs / Jesse S.</td>
+          <td>Built a solid bridge by staying human, relatable, and low-pressure — secured a meeting despite cold market.</td>
+          <td><a href="https://drive.google.com/file/d/1luVWehzj4GwXRdkEFgoOnku--emIgEOX/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1F0EQAujpKomIjnXjGtD-YtmpMVDUVFKt/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Jesse earns product interest by adapting quickly — soft pitch with tight timing.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Software Development</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Vusion / Jesse S.</td>
+          <td>Kept it respectful and adaptable, getting product interest despite limited availability.</td>
+          <td><a href="https://drive.google.com/file/d/1kFKsmsJACXOzR78QXuRzfLpAL-RiF_3x/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1oQIEuBGr6GNDofBQ15oqDG_ah0yZDaTa/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Anand leverages a referral angle to gather intel and move a conversation forward — smooth multi-threading.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Software Development</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Vusion / Anand P.</td>
+          <td>Uncovered a high-value lead and pivoted smoothly into a referral path with key intel.</td>
+          <td><a href="https://drive.google.com/file/d/1t_Fyu-n7ktawnscMWQSeLAV2Vg7o7oSr/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1_eR15aZrgk5-4pxdVyAGeWXcy1PFptQc/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Paige spots urgency fast and leans into the switch opportunity — discovery in motion.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>eCommerce</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>Bevy / Paige G.</td>
+          <td>Capitalized on perfect timing, quickly identifying urgency and securing a meeting with a highly engaged buyer.</td>
+          <td><a href="https://drive.google.com/file/d/1ikcUDiDkNeI6IK4XGDbD7rggo4q2hHfa/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/18FHaCZoGbzuZ3qfkgjAwwlY-nVhYrgTe/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Jesse balances professionalism and persistence in IT sales — keeping doors open.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>IT Services</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Unify / Jesse S.</td>
+          <td>Uncovered a clear need and handled pushback with professionalism while keeping the door open.</td>
+          <td><a href="https://drive.google.com/file/d/1CdrYs424g6JBmWB7Q5yd206tkpHpBsbM/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1M8I5LCvRILibC5ZbsgO-wAKwjGjLDuLJ/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Angela adapts mid-call, redirects her narrative, and lands a workshop meeting — seamless pivot.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Business Consulting</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Income/Outcome / Angela H.</td>
+          <td>Handled the redirect with ease, quickly qualifying the new contact and adapting her pitch.</td>
+          <td><a href="https://drive.google.com/file/d/14tIOZg0_tvneTMaMzsI12pOjVb1--GBY/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/18XHWT6H4IeUkS2bvRECx7jSGrW0LY1c_/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Russell stays composed through objection and uses real-world outcomes to create momentum — smart fintech entry.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Fintech</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Edgescore / Russell H.</td>
+          <td>Stayed composed when the prospect pivoted, smoothly explaining the value and creating momentum.</td>
+          <td><a href="https://drive.google.com/file/d/16lRUjyOKbDacPVBJT0Sw0Xlco0es4pgX/view?usp=sharing" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1F82MHA1JK4oyuNuyR07evOjppU0K35l3/view?usp=sharing" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Daniel stays steady through resistance and guides a cold buyer into meaningful qualification — calm control.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Outsourcing: BN Digital</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>BN Digital / Daniel D.</td>
+          <td>Calm control and smooth objection handling kept the call on track. Can push deeper on discovery.</td>
+          <td><a href="https://drive.google.com/file/d/1kdYjX1t9k2YfRjBcxzmFW9ySIKfUeQZI/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1xmfA3Hf3Egyx8SvPTSBQJfDPVfJTYXI6/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Paige lands the meeting with confident, low-pressure delivery and strong flexibility — reading the prospect well.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Software / Technology</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>Vistaar / Paige G.</td>
+          <td>Handled "not my lane" with calm confidence. Kept the call light and collaborative.</td>
+          <td><a href="https://drive.google.com/file/d/1hIjn757EZxXAYoS4u5Jt9gl8SipBxRwz/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1CMGowcPTiil79_167VUHxfL4nbNDpedl/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Jesse keeps it real and earns the meeting by disarming with transparency and budget-focused framing.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>MarTech</td>
+          <td><span class="pill pill-product">Product</span></td>
+          <td>MMM / Jesse S.</td>
+          <td>Used a relatable scenario (CEO cutting budget) to uncover lack of visibility. Kept it human and light.</td>
+          <td><a href="https://drive.google.com/file/d/1DY3tVhIqaTgycMcgjUF8Wh5c-5sD07OM/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1HqWa_mcKQJbGVmIZ6NWhdV93c50xA6md/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Alli stays grounded and earns the meeting by directly addressing skepticism with transparency.</td>
+          <td><span class="pill pill-booked">Booked</span></td>
+          <td>Insurance</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>Unico / Alli F.</td>
+          <td>Kept the tone human, candid, and value-first. Matched Rick's no-nonsense approach perfectly.</td>
+          <td><a href="https://drive.google.com/file/d/1kQxxqjZImXfEuuot5_cTqwk2xj9H367d/view?usp=drive_link" target="_blank">&#127911; Call</a> &middot; <a href="https://drive.google.com/file/d/1zPnkrdtyBDuk9pJtqct0VOgUKA_mQ5gd/view?usp=drive_link" target="_blank">&#128196; Transcript</a></td>
+        </tr>
+
+        <tr>
+          <td>Josh provides a clear example of tone control and restraint — credibility through calm delivery (one-sided call).</td>
+          <td><span class="pill pill-sql">SQL</span></td>
+          <td>eCommerce Agency</td>
+          <td><span class="pill pill-service">Service</span></td>
+          <td>DYODE / Josh C.</td>
+          <td>Calm, controlled, intentional delivery — earns attention by respecting time and stating purpose clearly.</td>
+          <td><a href="https://drive.google.com/file/d/1YHlT1qKsBvB8lXM-JrqnTzesYe8IsgTn/view?usp=sharing" target="_blank">&#127911; Call</a></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- COLD CALL SCRIPTS -->
+<!-- ============================================================ -->
+<section class="section" id="scripts">
+  <div class="section-header">
+    <h2>Cold Call Scripts &amp; Frameworks</h2>
+    <span class="tag">Scripts</span>
+  </div>
+  <p class="section-intro">Pick a script based on your personality, client vertical, or prospect type. Try two styles to find your natural rhythm.</p>
+  <p style="margin-bottom:2rem;">
+    <a class="card-link" href="https://drive.google.com/drive/folders/1yHlyukiPrRQmkyKqbEiamKaTekutQ2yO?usp=drive_link" target="_blank">&#128193; Full Scripts Folder</a>
+    <a class="card-link" href="https://docs.google.com/document/d/1MqCUixDCpbeuwAg9sR_tTXd9yceGG8qgIUAjKEfOd2A/edit?usp=drive_link" target="_blank" style="margin-left:0.5rem;">&#128196; Quick Guide</a>
+    <a class="card-link" href="https://www.loom.com/share/9899949846e4491099ed5630eb4d7e3a" target="_blank" style="margin-left:0.5rem;">&#9654; Video Walkthrough</a>
+  </p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-label">Calm, Curious</div>
+      <h3>Permission + Poke</h3>
+      <p>SaaS — Compliance / Risk / PCI, Construction Tech — Closeout. Ideal for mid-market SaaS, Ops, Healthcare.</p>
+      <a class="card-link" href="https://docs.google.com/document/u/0/d/1dPIxaaIUrupEmcp9kn458khCDKTdpAt7dhLG8xFeero/edit" target="_blank">&#128196; Open Script</a>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Warm, Listener</div>
+      <h3>Mirror &amp; Empathy</h3>
+      <p>HR — Onboarding, Marketing — Campaign Ops. Ideal for Creative, Agency, DEI.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/10fyxQ8KpEjbRzHyX_Rb4vq6WUSVKKow4f2idVWCPYmQ/edit?usp=sharing" target="_blank">&#128196; Open Script</a>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Direct, Energetic</div>
+      <h3>Energy + Discovery-First</h3>
+      <p>RevOps — Pipeline Accuracy, Manufacturing — Product Innovation. Ideal for Sales Ops, Innovation Teams.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1GMBscz4fUeLnRD93elAq6lYEudYsVVoUwIS0Ebhq3Ag/edit?usp=sharing" target="_blank">&#128196; Open Script</a>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Research-Driven</div>
+      <h3>Insight-Led Personalization</h3>
+      <p>Fintech — CFO Enablement, HealthTech — ER Bottlenecks. Ideal for Senior Decision-Makers, Account-Based.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1pNuRWGWXmvoaSwhg1crK-lGtQnoOkjcYrH8NCgbAAMY/edit?usp=drive_link" target="_blank">&#128196; Open Script</a>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Bold, Analytical</div>
+      <h3>Challenger + Data Punch</h3>
+      <p>Martech — Email Performance, AI — GPU Optimization. Ideal for Execs, Technical Buyers, Challenger Orgs.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1vxMmHXYlfAal5bbwKJOuDbSDT4ldesx0YI4IcOlKAtU/edit?usp=sharing" target="_blank">&#128196; Open Script</a>
+    </div>
+  </div>
+
+  <div class="sub-group" style="margin-top:3rem;">
+    <h3>Other Resources</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Dark Arts: Talk Track Builder</h3>
+        <p>A modular conversation system built for modern outbound — designed to break patterns and earn attention. Use before any cold call or first message.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1D4RmAJGJkqV3wA2olYYc08LP2_93w7INhVBB49O0WVQ/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+      <div class="card">
+        <h3>Dark Arts: Messaging by Psychological Buying Stage</h3>
+        <p>Sync your message to where the buyer's head is actually at. Built for reps who don't want to guess and miss.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1gwVFEarX8GpdBjkM_DXwOw2boql0ltYsuWv5k--2vho/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+      <div class="card">
+        <h3>Martal's Top Messaging &amp; Calling Tips</h3>
+        <p>Quick reference with 10 proven messaging and calling tips for cold outreach in 2026. Sharpen your tone, reset your approach.</p>
+        <a class="card-link" href="https://docs.google.com/document/d/1UU653Xl8N4Q_dPethdqsvCeooInYS0PF8mZvrnc-jTw/edit?usp=sharing" target="_blank">&#128196; Open Doc</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- OBJECTION HANDLING -->
+<!-- ============================================================ -->
+<section class="section" id="objections">
+  <div class="section-header">
+    <h2>Objection Handling Vault</h2>
+    <span class="tag">Reframe, Don't Rebut</span>
+  </div>
+  <p class="section-intro">Your goal isn't to "win" — it's to understand what's behind the no, and turn that into relevance.</p>
+  <p style="margin-bottom:2rem;">
+    <a class="card-link" href="https://drive.google.com/drive/folders/1EfTDoI3KS9ElwCPiBlOdJ0x7g1biHZe9?usp=sharing" target="_blank">&#128193; Full Vault Folder</a>
+    <a class="card-link" href="https://docs.google.com/document/d/1NCyfLRPk2QPZEsfKtI1LAfdquahMPjaZXJjYfwfrPQQ/edit?usp=sharing" target="_blank" style="margin-left:0.5rem;">&#128196; Full Objection Handling Doc</a>
+  </p>
+
+  <div class="objection-grid">
+    <div class="objection-card">
+      <h4>1. PAIN Problem</h4>
+      <div class="examples">"We're happy with our current provider." / "Honestly, we're doing fine right now."</div>
+      <p>They're satisfied — no pain. Your job is to surface latent pain they haven't articulated yet.</p>
+    </div>
+
+    <div class="objection-card">
+      <h4>2. TIMING Problem</h4>
+      <div class="examples">"We're too busy right now." / "We're waiting until next quarter." / "This isn't a priority."</div>
+      <p>Not now / too busy / later. Reframe around what waiting actually costs them.</p>
+    </div>
+
+    <div class="objection-card">
+      <h4>3. MONEY Problem</h4>
+      <div class="examples">"We don't have budget." / "We're under contract for another year."</div>
+      <p>No budget / locked-in / cost issues. Shift from cost to cost of inaction.</p>
+    </div>
+
+    <div class="objection-card">
+      <h4>4. BRUSH-OFF Problem</h4>
+      <div class="examples">"Send me something and I'll take a look." / "Can you just email me some info?"</div>
+      <p>Send info / email me. They're trying to end the call. Earn 30 more seconds of relevance.</p>
+    </div>
+
+    <div class="objection-card">
+      <h4>5. FEAR OF CHANGE Problem</h4>
+      <div class="examples">"We're not looking to switch platforms." / "We've got something built in-house."</div>
+      <p>Switching is scary. Acknowledge the risk and reframe as augmentation, not replacement.</p>
+    </div>
+
+    <div class="objection-card">
+      <h4>6. SKEPTICISM Problem</h4>
+      <div class="examples">"We've tried something like this before and it didn't work."</div>
+      <p>Tried before, didn't work. Validate their experience and differentiate what's different this time.</p>
+    </div>
+
+    <div class="objection-card">
+      <h4>7. DECISION-MAKING Problem</h4>
+      <div class="examples">"I need to run this by my team."</div>
+      <p>Find out if this is a real next step or a polite exit. Help them build the internal case.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LINKEDIN -->
+<!-- ============================================================ -->
+<section class="section" id="linkedin">
+  <div class="section-header">
+    <h2>LinkedIn Resources</h2>
+    <span class="tag">Sales Navigator</span>
+  </div>
+  <p class="section-intro" style="color:var(--text-3); font-style:italic; margin-bottom:1rem;">Work in progress — resources being expanded.</p>
+
+  <div class="sub-group">
+    <h3>Core Skills</h3>
+    <div class="link-list">
+      <a class="link-item" href="https://training.sales.linkedin.com/account-iq/1793625" target="_blank">
+        <div class="icon">&#128269;</div>
+        <div class="info"><h4>Account IQ</h4><p>Researching target accounts — using AI to summarize account overviews.</p></div>
+      </a>
+      <a class="link-item" href="https://training.sales.linkedin.com/quickly-identify-and-prioritize-leads-with-personas/1532095" target="_blank">
+        <div class="icon">&#128101;</div>
+        <div class="info"><h4>Personas, Saved Searches, Alerts &amp; Notifications</h4><p>Building contact lists in accounts aligned to ICP.</p></div>
+      </a>
+      <a class="link-item" href="https://training.sales.linkedin.com/use-advanced-search-filters-to-find-leads/1914389" target="_blank">
+        <div class="icon">&#127758;</div>
+        <div class="info"><h4>Advanced Search Filters to Find Leads</h4><p>Filtering based on geo location and ICP for events.</p></div>
+      </a>
+      <a class="link-item" href="https://training.sales.linkedin.com/find-the-right-buyers/1794153" target="_blank">
+        <div class="icon">&#128260;</div>
+        <div class="info"><h4>Job Changes &amp; Relationship Explorer</h4><p>Researching employee movement and targeting friendlies who've moved to other companies.</p></div>
+      </a>
+      <a class="link-item" href="https://training.sales.linkedin.com/personalize-your-outreach-with-message-assist/2166178" target="_blank">
+        <div class="icon">&#9993;</div>
+        <div class="info"><h4>Message Assist</h4><p>Message assist for InMails &amp; best practices.</p></div>
+      </a>
+      <a class="link-item" href="https://training.sales.linkedin.com/using-teamlink-to-secure-warm-introductions/1527078" target="_blank">
+        <div class="icon">&#129309;</div>
+        <div class="info"><h4>TeamLink: Warm Introductions</h4><p>New feature being added soon — use TeamLink to secure warm intros.</p></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sub-group" style="margin-top:2.5rem;">
+    <h3>Onboarding</h3>
+    <div class="link-list">
+      <a class="link-item" href="https://training.sales.linkedin.com/sales-navigator-quick-start-guide" target="_blank">
+        <div class="icon">&#9889;</div>
+        <div class="info"><h4>Activating Your Sales Navigator Account</h4><p>Quick 2-minute tutorial on activation.</p></div>
+      </a>
+      <a class="link-item" href="https://www.linkedin.com/business/sales/blog/sales-navigator/four-videos-for-getting-started-with-linkedin-sales-navigator" target="_blank">
+        <div class="icon">&#9654;</div>
+        <div class="info"><h4>Getting Started — Quick Videos</h4><p>Four quick videos to get started (10 min total).</p></div>
+      </a>
+      <a class="link-item" href="https://training.sales.linkedin.com/linkedin-sales-navigator-starter-plan" target="_blank">
+        <div class="icon">&#127891;</div>
+        <div class="info"><h4>Introduction to Sales Navigator Course</h4><p>Full getting started course (45 min).</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PROSPECTING TIPS -->
+<!-- ============================================================ -->
+<section class="section" id="prospecting">
+  <div class="section-header">
+    <h2>Prospecting Tips</h2>
+    <span class="tag">Intelligence</span>
+  </div>
+  <p style="margin-bottom:2rem;">
+    <a class="card-link" href="https://drive.google.com/drive/folders/1S0cwSi3U4T_HY95-VtiBQjIM0hudQdAQ?usp=drive_link" target="_blank">&#128193; Full Prospecting Tips Folder</a>
+  </p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>Trigger-Based Prospecting</h3>
+      <p>Spot relevant signals that indicate the right time to reach out — before your competition does.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1HGpPjcuLQBGUdLKHFZ_G7TqABA3nfQSPj4jk7WOUMbw/edit?usp=sharing" target="_blank">&#128196; Open Guide</a>
+    </div>
+
+    <div class="card">
+      <h3>Title Targeting Tips</h3>
+      <p>Target the right people with the right message — based on what they actually own, not just what their title says.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1lBCwqK6ax_W_Wz7VxrsjzlOe_hOtA9BfdtmfIMqGLc8/edit?usp=sharing" target="_blank">&#128196; Open Guide</a>
+    </div>
+
+    <div class="card">
+      <h3>Tech Stack Scouting Tips</h3>
+      <p>Use a prospect's tech stack to infer pain points, qualify fit, and tailor your messaging — before the first touch.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/15SH5Y6hvrDzCaI72qdU7_ra0on9csIZsJFZi96Hvq2g/edit?usp=sharing" target="_blank">&#128196; Open Guide</a>
+    </div>
+
+    <div class="card">
+      <h3>Tech Stack by Vertical</h3>
+      <p>Use industry-specific stack clues to validate ICP, infer challenges, and write smarter outreach.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1NoNHE7ligoCZmWJv8VmUFsxaAdguCKqjjGoIhqGx63s/edit?usp=sharing" target="_blank">&#128196; Open Guide</a>
+    </div>
+
+    <div class="card">
+      <h3>Hypothesis of Pain</h3>
+      <p>Improve message relevance by quickly identifying what the prospect is likely struggling with — even if they haven't said it yet.</p>
+      <a class="card-link" href="https://docs.google.com/document/d/1Wyh3W-qhe0DJAQ89eu92_qdT-tpUz93gaehD_3a8pVs/edit?usp=sharing" target="_blank">&#128196; Open Guide</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Martal Group &middot; Sales Enablement Library &middot; 2026</p>
+</footer>
+
+<script>
+// Simple search/filter functionality
+document.addEventListener('DOMContentLoaded', () => {
+  // Smooth scroll for nav links - close mobile menu on click
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.remove('open');
+    });
+  });
+});
+</script>
+</body>
+</html>
