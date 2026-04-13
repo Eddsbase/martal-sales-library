@@ -269,7 +269,7 @@ Sign in with Google
 <a href="#prospecting">Prospecting</a>
 </div>
 <div class="auth-user" id="authUser" style="display:none">
-<img id="authAvatar" src="" alt="">
+<img id="authAvatar" src="" alt="" onerror="this.style.display='none'" style="display:none">
 <span id="authName"></span>
 <button class="admin-btn" id="adminBtn" onclick="openAdminPanel()">&#9881; Admin</button>
 <button class="auth-signout" id="authSignout">Sign out</button>
@@ -695,7 +695,10 @@ function grantAccess(user){
   const authAvatar = document.getElementById('authAvatar');
   const authName = document.getElementById('authName');
   authUser.style.display = 'flex';
-  if(user.picture) authAvatar.src = user.picture;
+  if(user.picture){
+    authAvatar.onload = function(){ this.style.display = ''; };
+    authAvatar.src = user.picture;
+  }
   authName.textContent = user.name || user.email;
 
   // Show admin button for admins
@@ -1115,18 +1118,25 @@ document.addEventListener('keydown',function(e){
 
 // Domains/patterns that can be embedded in an iframe
 function isEmbeddable(url){
-  const embeddablePatterns = [
-    'docs.google.com',
-    'drive.google.com',
-    'loom.com',
-    'youtube.com',
-    'youtu.be',
-    'vimeo.com',
-    'docs.google.com/spreadsheets',
-    'docs.google.com/presentation',
-  ];
   const lower = url.toLowerCase();
-  return embeddablePatterns.some(p => lower.includes(p));
+
+  // Google Drive folders/multi-file views → always new tab
+  if(lower.includes('drive.google.com/drive/')) return false;
+
+  // Single Drive file previews → embed
+  if(lower.includes('drive.google.com/file/d/')) return true;
+
+  // Google Docs/Sheets/Slides → embed
+  if(lower.includes('docs.google.com')) return true;
+
+  // Video platforms → embed
+  if(lower.includes('loom.com')) return true;
+  if(lower.includes('youtube.com')) return true;
+  if(lower.includes('youtu.be')) return true;
+  if(lower.includes('vimeo.com')) return true;
+
+  // Everything else → new tab
+  return false;
 }
 
 // Intercept external link clicks
