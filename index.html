@@ -269,7 +269,7 @@ Sign in with Google
 <a href="#prospecting">Prospecting</a>
 </div>
 <div class="auth-user" id="authUser" style="display:none">
-<img id="authAvatar" src="" alt="" onerror="this.style.display='none'" style="display:none">
+<img id="authAvatar" src="" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'" style="display:none">
 <span id="authName"></span>
 <button class="admin-btn" id="adminBtn" onclick="openAdminPanel()">&#9881; Admin</button>
 <button class="auth-signout" id="authSignout">Sign out</button>
@@ -1120,21 +1120,13 @@ document.addEventListener('keydown',function(e){
 function isEmbeddable(url){
   const lower = url.toLowerCase();
 
-  // Google Drive folders/multi-file views → always new tab
-  if(lower.includes('drive.google.com/drive/')) return false;
-
-  // Single Drive file previews → embed
-  if(lower.includes('drive.google.com/file/d/')) return true;
-
-  // Google Docs/Sheets/Slides → embed
-  if(lower.includes('docs.google.com')) return true;
-
-  // Video platforms → embed
+  // Only these platforms have proper embed support from external domains
   if(lower.includes('loom.com')) return true;
   if(lower.includes('youtube.com')) return true;
   if(lower.includes('youtu.be')) return true;
   if(lower.includes('vimeo.com')) return true;
 
+  // Google Docs/Sheets/Drive all require org auth — won't work in iframe from github.io
   // Everything else → new tab
   return false;
 }
