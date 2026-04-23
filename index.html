@@ -237,6 +237,24 @@ a:hover{color:var(--g2)}
 .admin-msg.success{display:block;background:rgba(128,177,34,.1);color:var(--g);border:1px solid var(--g-bd)}
 .admin-msg.error{display:block;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
 .admin-loading{text-align:center;padding:2rem;color:var(--t3);font-size:.82rem}
+.admin-tabs{display:flex;gap:0;border-bottom:1px solid var(--b1);padding:0 1.5rem;background:var(--s2)}
+.admin-tab{padding:.7rem 1rem;font-size:.75rem;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;font-family:var(--m);text-transform:uppercase;letter-spacing:.06em}
+.admin-tab:hover{color:var(--t2)}
+.admin-tab.active{color:var(--g);border-bottom-color:var(--g)}
+.admin-tab-content{display:none}
+.admin-tab-content.active{display:block}
+.usage-table{width:100%;border-collapse:collapse;font-size:.75rem}
+.usage-table th{text-align:left;font-family:var(--m);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t4);padding:.6rem .5rem;border-bottom:1px solid var(--b1);position:sticky;top:0;background:var(--s1);z-index:1}
+.usage-table td{padding:.5rem;border-bottom:1px solid rgba(255,255,255,.03);color:var(--t2);font-size:.72rem;white-space:nowrap}
+.usage-table td:last-child{white-space:normal;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.usage-table tr:hover td{background:rgba(255,255,255,.02)}
+.usage-pill{display:inline-block;font-size:.55rem;padding:.15rem .4rem;border-radius:4px;font-family:var(--m);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.usage-pill.login{background:rgba(45,156,219,.12);color:var(--bl)}
+.usage-pill.view{background:rgba(128,177,34,.12);color:var(--g)}
+.usage-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.2rem}
+.usage-stat{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:.7rem .8rem;text-align:center}
+.usage-stat .us-num{font-size:1.3rem;font-weight:700;color:var(--g);font-family:var(--m)}
+.usage-stat .us-lbl{font-size:.58rem;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;margin-top:.15rem;font-family:var(--m)}
 </style>
 </head>
 <body>
@@ -539,11 +557,16 @@ Sign in with Google
 <div class="admin-overlay" id="adminOverlay">
 <div class="admin-panel">
 <div class="admin-hd">
-<h3>&#9881; Access Management</h3>
+<h3>&#9881; Admin Panel</h3>
 <span id="adminStats" style="font-size:.7rem;color:var(--t3);font-family:var(--m)"></span>
 <button class="modal-close" onclick="closeAdminPanel()">&times;</button>
 </div>
+<div class="admin-tabs">
+<div class="admin-tab active" onclick="switchAdminTab('access')">Access</div>
+<div class="admin-tab" onclick="switchAdminTab('usage')">Usage</div>
+</div>
 <div class="admin-body">
+<div class="admin-tab-content active" id="tabAccess">
 <div class="admin-msg" id="adminMsg"></div>
 
 <div class="admin-section">
@@ -575,6 +598,22 @@ Sign in with Google
 <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--b1);text-align:center">
 <a id="adminSheetLink" href="#" target="_blank" style="font-size:.72rem;color:var(--t3);text-decoration:none;font-family:var(--m)">Open Google Sheet for bulk editing &#8599;</a>
 </div>
+</div>
+
+<div class="admin-tab-content" id="tabUsage">
+<div class="usage-summary" id="usageSummary">
+<div class="usage-stat"><div class="us-num" id="usLogins">-</div><div class="us-lbl">Logins (7d)</div></div>
+<div class="usage-stat"><div class="us-num" id="usViews">-</div><div class="us-lbl">Resources (7d)</div></div>
+<div class="usage-stat"><div class="us-num" id="usUsers">-</div><div class="us-lbl">Unique Users</div></div>
+</div>
+<div style="max-height:45vh;overflow-y:auto">
+<table class="usage-table">
+<thead><tr><th>Time</th><th>User</th><th>Event</th><th>Detail</th></tr></thead>
+<tbody id="usageBody"><tr><td colspan="4" class="admin-loading">Loading...</td></tr></tbody>
+</table>
+</div>
+</div>
+
 </div>
 </div>
 </div>
@@ -720,6 +759,9 @@ function grantAccess(user){
   if(isAdmin(user.email)){
     document.getElementById('adminBtn').classList.add('visible');
   }
+
+  // Log the login
+  logActivity('login', 'Signed in');
 
   // Set GA4 user
   if(typeof gtag==='function'){
@@ -908,6 +950,68 @@ window.adminRemoveEmail = function(email){
 document.getElementById('adminEmailInput').addEventListener('keydown', function(e){
   if(e.key === 'Enter') adminAddEmail();
 });
+
+// ── ADMIN TABS ──
+window.switchAdminTab = function(tab){
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase() === tab));
+  document.getElementById('tabAccess').classList.toggle('active', tab === 'access');
+  document.getElementById('tabUsage').classList.toggle('active', tab === 'usage');
+  if(tab === 'usage') fetchUsageLog();
+};
+
+// ── ACTIVITY LOGGING ──
+function logActivity(type, detail){
+  if(!AUTH_CONFIG.apiUrl) return;
+  const session = getSession();
+  if(!session) return;
+  const url = AUTH_CONFIG.apiUrl + '?action=log&type=' + encodeURIComponent(type)
+    + '&email=' + encodeURIComponent(session.email)
+    + '&name=' + encodeURIComponent(session.name || '')
+    + '&detail=' + encodeURIComponent(detail || '');
+  // Fire and forget
+  fetch(url).catch(()=>{});
+}
+
+// ── USAGE LOG DISPLAY ──
+function fetchUsageLog(){
+  if(!AUTH_CONFIG.apiUrl){
+    document.getElementById('usageBody').innerHTML = '<tr><td colspan="4" style="color:var(--t4);font-size:.78rem;padding:2rem;text-align:center">API not configured</td></tr>';
+    return;
+  }
+  document.getElementById('usageBody').innerHTML = '<tr><td colspan="4" class="admin-loading">Loading...</td></tr>';
+  fetch(AUTH_CONFIG.apiUrl + '?action=usage')
+    .then(r => r.json())
+    .then(data => {
+      if(!data.log || !data.log.length){
+        document.getElementById('usageBody').innerHTML = '<tr><td colspan="4" style="color:var(--t4);font-size:.78rem;padding:2rem;text-align:center">No activity yet</td></tr>';
+        return;
+      }
+      // Stats
+      const now = Date.now();
+      const week = 7*24*60*60*1000;
+      const recent = data.log.filter(e => (now - new Date(e.ts).getTime()) < week);
+      const logins = recent.filter(e => e.type === 'login').length;
+      const views = recent.filter(e => e.type === 'view').length;
+      const users = new Set(data.log.map(e => e.email)).size;
+      document.getElementById('usLogins').textContent = logins;
+      document.getElementById('usViews').textContent = views;
+      document.getElementById('usUsers').textContent = users;
+
+      // Table (most recent first, limit 100)
+      const rows = data.log.slice(-100).reverse();
+      document.getElementById('usageBody').innerHTML = rows.map(e => {
+        const d = new Date(e.ts);
+        const timeStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+        const pillClass = e.type === 'login' ? 'login' : 'view';
+        const label = e.type === 'login' ? 'Login' : 'View';
+        const emailShort = (e.email||'').split('@')[0];
+        return '<tr><td>'+timeStr+'</td><td title="'+e.email+'">'+emailShort+'</td><td><span class="usage-pill '+pillClass+'">'+label+'</span></td><td title="'+(e.detail||'')+'">'+((e.detail||'').substring(0,60))+'</td></tr>';
+      }).join('');
+    })
+    .catch(err => {
+      document.getElementById('usageBody').innerHTML = '<tr><td colspan="4" style="color:#ef4444;font-size:.78rem;padding:2rem;text-align:center">Failed to load: '+err.message+'</td></tr>';
+    });
+}
 
 // Google Sign-In callback (global)
 window.handleGoogleSignIn = function(response){
@@ -1100,6 +1204,7 @@ function openModal(url,titleText){
 
   // Track resource open
   trackEvent('resource_open', { resource_title: titleText, resource_url: url });
+  logActivity('view', titleText);
 
   // Just hide spinner after 3s — iframe stays visible regardless
   const timer=setTimeout(()=>{
@@ -1173,6 +1278,7 @@ document.addEventListener('click',function(e){
   } else {
     // Open directly in new tab
     trackEvent('resource_open', { resource_title: getTitle(link), resource_url: href });
+    logActivity('view', getTitle(link));
     window.open(href, '_blank', 'noopener');
   }
 });
